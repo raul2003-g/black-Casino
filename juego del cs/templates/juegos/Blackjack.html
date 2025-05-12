@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BLACKJACK DELUXE</title>
+    <style>
+        :root {
+            --color-fondo: #0a1a0f;
+            --color-panel: #0e2e1a;
+            --color-oro: #ffd700;
+            --color-texto: #ffffff;
+            --sombra: 0 0 30px rgba(0, 0, 0, 0.7);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        @font-face {
+            font-family: 'Casino';
+            src: url('https://fonts.cdnfonts.com/css/atlantic-cruise') format('woff2');
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            color: var(--color-texto);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(10, 80, 50, 0.8) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(20, 60, 30, 0.6) 0%, transparent 40%),
+                linear-gradient(to bottom, var(--color-fondo), #000000);
+            animation: fondoAnimado 20s infinite alternate;
+        }
+
+        @keyframes fondoAnimado {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 100% 100%; }
+        }
+
+        /* Balance Panel */
+        .balance-panel {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 10px 20px;
+            border-radius: 25px;
+            border: 2px solid var(--color-oro);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+            z-index: 1000;
+        }
+
+        .balance-icon {
+            color: var(--color-oro);
+            font-size: 1.2rem;
+        }
+
+        .back-to-lobby {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+            border: 1px solid var(--color-oro);
+            z-index: 1000;
+            transition: all 0.3s;
+        }
+
+        .back-to-lobby:hover {
+            background: rgba(255, 215, 0, 0.2);
+        }
+
+        /* Contenedor principal */
+        .container {
+            width: 100%;
+            max-width: 950px;
+            background-color: rgba(14, 46, 26, 0.9);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: var(--sombra);
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+        }
+
+        h1 {
+            font-family: 'Casino', sans-serif;
+            color: var(--color-oro);
+            text-shadow: 3px 3px 6px #000;
+            margin-bottom: 15px;
+            font-size: 3rem;
+            letter-spacing: 2px;
+        }
+
+        /* Sección de fichas */
+        .fichas-container {
+            background-color: rgba(0, 0, 0, 0.4);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .fichas {
+            font-size: 2.2rem;
+            color: var(--color-oro);
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+
+        /* Sección de apuesta */
+        .apuesta-container {
+            margin: 25px 0;
+            padding: 15px;
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+        }
+
+        .apuesta-input {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .apuesta-display {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 1px solid var(--color-oro);
+        }
+
+        .apuesta-display button {
+            padding: 5px 10px;
+            font-size: 1rem;
+            background: rgba(255, 215, 0, 0.3);
+            border: none;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .apuesta-display button:hover {
+            background: rgba(255, 215, 0, 0.5);
+        }
+
+        #valorApuesta {
+            font-size: 1.3rem;
+            font-weight: bold;
+            min-width: 60px;
+            text-align: center;
+            color: var(--color-oro);
+        }
+
+        .botones-apuesta {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        /* Botones */
+        button {
+            background: linear-gradient(to bottom, var(--color-oro), #daa520);
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1rem;
+            color: #000;
+            text-shadow: 0 1px 1px rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            background: linear-gradient(45deg, rgba(255, 255, 255, 0.1), transparent);
+            transform: rotate(45deg);
+            z-index: 0;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.4);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        button:disabled {
+            background: #555;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Área de juego */
+        .juego-container {
+            display: none;
+            margin-top: 20px;
+            animation: aparecer 0.5s ease-out;
+        }
+
+        @keyframes aparecer {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .mano {
+            margin: 30px 0;
+            padding: 15px;
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+        }
+
+        .mano-titulo {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            color: var(--color-oro);
+            text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+        }
+
+        .cartas-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            min-height: 160px;
+            padding: 10px;
+        }
+
+        /* Cartas */
+        .carta {
+            width: 110px;
+            height: 160px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s;
+            position: relative;
+            background-color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0;
+        }
+
+        .carta::before {
+            content: attr(data-valor);
+            position: absolute;
+            top: 5px;
+            left: 10px;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .carta::after {
+            content: attr(data-palo);
+            position: absolute;
+            bottom: 5px;
+            right: 10px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            transform: rotate(180deg);
+        }
+
+        .carta.corazon, .carta.diamante {
+            color: red;
+        }
+
+        .carta.trebol, .carta.pica {
+            color: black;
+        }
+
+        .carta-oculta {
+            background: linear-gradient(135deg, #d10000, #8b0000);
+            color: white !important;
+        }
+
+        .carta-oculta::before, .carta-oculta::after {
+            content: none;
+        }
+
+        .carta-oculta::after {
+            content: '?';
+            color: white;
+            font-size: 3rem;
+            transform: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .puntuacion {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-top: 15px;
+            color: var(--color-oro);
+        }
+
+        /* Mensajes */
+        .mensaje {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin: 25px 0;
+            color: var(--color-oro);
+            min-height: 50px;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.7);
+            animation: brillo 2s infinite alternate;
+        }
+
+        @keyframes brillo {
+            from { text-shadow: 0 0 5px rgba(255, 215, 0, 0.5); }
+            to { text-shadow: 0 0 15px rgba(255, 215, 0, 0.9); }
+        }
+
+        /* Animaciones */
+        @keyframes repartirCarta {
+            0% { transform: translateY(-100px) rotate(-30deg); opacity: 0; }
+            70% { transform: translateY(20px) rotate(10deg); opacity: 1; }
+            100% { transform: translateY(0) rotate(0); }
+        }
+
+        .carta-repartida {
+            animation: repartirCarta 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes sacudir {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-8px); }
+            40%, 80% { transform: translateX(8px); }
+        }
+
+        .sacudir {
+            animation: sacudir 0.4s linear;
+        }
+
+        /* Notificaciones */
+        .balance-notification {
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: bold;
+            z-index: 1000;
+            transition: opacity 0.5s;
+            border-left: 4px solid currentColor;
+            opacity: 1;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 { font-size: 2.2rem; }
+            .carta { width: 80px; height: 120px; }
+            .mano-titulo { font-size: 1.5rem; }
+            .mensaje { font-size: 1.4rem; }
+            button { padding: 10px 15px; font-size: 0.9rem; }
+            .balance-panel {
+                top: 10px;
+                right: 10px;
+                padding: 8px 15px;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container { padding: 15px; }
+            .carta { width: 70px; height: 105px; }
+            .apuesta-input { flex-direction: column; }
+            .apuesta-display { margin-bottom: 10px; }
+        }
+    </style>
+    <script>
+        const socket = io();
+    
+        // Unirse a la sala del usuario
+        socket.emit('join');
+    
+        // Escuchar cambios de saldo
+        socket.on('balance_update', function(data) {
+            const saldo = data.balance;
+            const balanceElement = document.getElementById('balance-display');
+            if (balanceElement) {
+                balanceElement.textContent = saldo;
+            }
+        });
+    </script>
+    
+</head>
+<script src="/static/js/balance-system.js"></script>
+<body>
+    <!-- Botón para volver al lobby -->
+    <a href="/" class="back-to-lobby">← Volver al Lobby</a>
+
+    <!-- Panel de saldo CORREGIDO -->
+    <div class="balance-panel">
+        <span class="balance-icon">💰</span>
+        <span id="saldo-usuario">{{ user_balance }}</span>
+    </div>
+
+    <div class="container">
+        <h1>BLACKJACK DELUXE</h1>
+        
+        <div class="fichas-container">
+            <p>TUS FICHAS:</p>
+            <span id="saldo-usuario">{{ user_balance }}</span>
+        </div>
+        
+        <div class="apuesta-container">
+            <p>APUESTA: Mínimo $50 | Máximo $5000</p>
+            <div class="apuesta-input">
+                <div class="apuesta-display">
+                    <button id="decrementarBtn">▼</button>
+                    <span id="valorApuesta">50</span>
+                    <button id="incrementarBtn">▲</button>
+                </div>
+                <button id="apostarBtn">APOSTAR</button>
+            </div>
+            <div class="botones-apuesta">
+                <button class="btn-apuesta-r" data-monto="50">+50</button>
+                <button class="btn-apuesta-r" data-monto="100">+100</button>
+                <button class="btn-apuesta-r" data-monto="500">+500</button>
+                <button class="btn-apuesta-r" data-monto="1000">+1000</button>
+            </div>
+        </div>
+        
+        <div id="juego-container" class="juego-container">
+            <div class="mano">
+                <h2 class="mano-titulo">CRUPIER</h2>
+                <div class="cartas-container" id="crupier-cartas"></div>
+                <div class="puntuacion">PUNTUACIÓN: <span id="crupier-puntos">?</span></div>
+            </div>
+            
+            <div class="mano">
+                <h2 class="mano-titulo">JUGADOR</h2>
+                <div class="cartas-container" id="jugador-cartas"></div>
+                <div class="puntuacion">PUNTUACIÓN: <span id="jugador-puntos">0</span></div>
+            </div>
+            
+            <div class="mensaje" id="mensaje"></div>
+            
+            <div class="botones-juego">
+                <button id="pedirBtn">PEDIR CARTA</button>
+                <button id="plantarseBtn">PLANTARSE</button>
+                <button id="doblarBtn">DOBLAR</button>
+                <button id="separarBtn">SEPARAR</button>
+                <button id="rendirseBtn">RENDIRSE</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variables para el sistema de apuestas
+        let apuestaActual = 50;
+        const MIN_APUESTA = 50;
+        const MAX_APUESTA = 5000;
+        const FICHAS = [50, 100, 500, 1000]; // Valores predefinidos
+
+        // Variables del juego
+        let apuesta = 0;
+        let baraja = [];
+        let manoCrupier = [];
+        let manoJugador = [];
+        let juegoActivo = false;
+        
+        // Elementos del DOM
+        const valorApuestaElement = document.getElementById('valorApuesta');
+        const incrementarBtn = document.getElementById('incrementarBtn');
+        const decrementarBtn = document.getElementById('decrementarBtn');
+        const apostarBtn = document.getElementById('apostarBtn');
+        const juegoContainer = document.getElementById('juego-container');
+        const crupierCartasElement = document.getElementById('crupier-cartas');
+        const crupierPuntosElement = document.getElementById('crupier-puntos');
+        const jugadorCartasElement = document.getElementById('jugador-cartas');
+        const jugadorPuntosElement = document.getElementById('jugador-puntos');
+        const mensajeElement = document.getElementById('mensaje');
+        const pedirBtn = document.getElementById('pedirBtn');
+        const plantarseBtn = document.getElementById('plantarseBtn');
+        const doblarBtn = document.getElementById('doblarBtn');
+        const separarBtn = document.getElementById('separarBtn');
+        const rendirseBtn = document.getElementById('rendirseBtn');
+        const botonesApuestaRapida = document.querySelectorAll('.btn-apuesta-r');
+        
+        // Mapeo de palos a clases CSS
+        const palosCSS = {
+            'H': 'corazon',
+            'D': 'diamante',
+            'C': 'trebol',
+            'S': 'pica'
+        };
+        
+        // Mapeo de valores a mostrar
+        const valoresMostrar = {
+            'A': 'A',
+            'K': 'K',
+            'Q': 'Q',
+            'J': 'J',
+            '10': '10',
+            '9': '9',
+            '8': '8',
+            '7': '7',
+            '6': '6',
+            '5': '5',
+            '4': '4',
+            '3': '3',
+            '2': '2'
+        };
+        
+        // Símbolos de los palos
+        const simbolosPalos = {
+            'H': '♥',
+            'D': '♦',
+            'C': '♣',
+            'S': '♠'
+        };
+
+        // Función para actualizar la apuesta
+        function actualizarApuesta(cambio) {
+            // Encontramos la ficha más cercana al cambio deseado
+            let nuevaApuesta = apuestaActual;
+            if (cambio > 0) {
+                // Buscamos la siguiente ficha mayor que la apuesta actual
+                const fichasMayores = FICHAS.filter(f => f > apuestaActual);
+                nuevaApuesta = fichasMayores.length > 0 ? fichasMayores[0] : FICHAS[FICHAS.length - 1];
+            } else {
+                // Buscamos la ficha más cercana hacia abajo
+                const fichasMenores = FICHAS.filter(f => f < apuestaActual);
+                nuevaApuesta = fichasMenores.length > 0 ? fichasMenores[fichasMenores.length - 1] : FICHAS[0];
+            }
+
+            // Validar límites
+            apuestaActual = Math.max(MIN_APUESTA, Math.min(MAX_APUESTA, nuevaApuesta));
+            valorApuestaElement.textContent = apuestaActual;
+        }
+        
+        // Inicializar baraja
+        function inicializarBaraja() {
+            const palos = ['H', 'D', 'C', 'S'];
+            const valores = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
+            baraja = [];
+            
+            for (let palo of palos) {
+                for (let valor of valores) {
+                    baraja.push({ palo, valor });
+                }
+            }
+            
+            // Barajar
+            for (let i = baraja.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [baraja[i], baraja[j]] = [baraja[j], baraja[i]];
+            }
+        }
+        
+        // Calcular puntuación
+        function calcularPuntuacion(mano) {
+            let puntuacion = 0;
+            let ases = 0;
+            
+            for (let carta of mano) {
+                if (carta.valor === 'A') {
+                    ases++;
+                    puntuacion += 11;
+                } else if (['K', 'Q', 'J'].includes(carta.valor)) {
+                    puntuacion += 10;
+                } else {
+                    puntuacion += parseInt(carta.valor);
+                }
+            }
+            
+            // Ajustar Ases si la puntuación es > 21
+            while (puntuacion > 21 && ases > 0) {
+                puntuacion -= 10;
+                ases--;
+            }
+            
+            return puntuacion;
+        }
+        
+        // Crear elemento carta
+        function crearElementoCarta(carta, ocultar = false) {
+            const cartaElement = document.createElement('div');
+            cartaElement.className = `carta carta-repartida ${palosCSS[carta.palo]}`;
+            
+            if (ocultar) {
+                cartaElement.classList.add('carta-oculta');
+            } else {
+                cartaElement.setAttribute('data-valor', valoresMostrar[carta.valor]);
+                cartaElement.setAttribute('data-palo', simbolosPalos[carta.palo]);
+                cartaElement.style.fontSize = carta.valor === '10' ? '1.2rem' : '1.5rem';
+            }
+            
+            return cartaElement;
+        }
+        
+        // Repartir carta con animación
+        function repartirCarta(mano, elemento, ocultar = false) {
+            const carta = baraja.pop();
+            mano.push(carta);
+            
+            const cartaElement = crearElementoCarta(carta, ocultar);
+            elemento.appendChild(cartaElement);
+            
+            return carta;
+        }
+        
+        // Mostrar todas las cartas del crupier
+        function mostrarCartasCrupier() {
+            crupierCartasElement.innerHTML = '';
+            for (let i = 0; i < manoCrupier.length; i++) {
+                const cartaElement = crearElementoCarta(manoCrupier[i], i === 0 && !juegoActivo);
+                crupierCartasElement.appendChild(cartaElement);
+            }
+            crupierPuntosElement.textContent = calcularPuntuacion(manoCrupier);
+        }
+        
+        // Comprobar resultado
+        function comprobarResultado(balanceSystem) {
+            const puntosJugador = calcularPuntuacion(manoJugador);
+            const puntosCrupier = calcularPuntuacion(manoCrupier);
+            
+            mostrarCartasCrupier();
+            
+            if (puntosJugador > 21) {
+                mensajeElement.textContent = '¡Te pasaste de 21!';
+                balanceSystem.updateBalance(-apuesta, false);
+            } else if (puntosCrupier > 21) {
+                const ganancia = apuesta;
+                mensajeElement.textContent = `¡Crupier se pasó! GANAS $${ganancia}`;
+                balanceSystem.updateBalance(ganancia, true);
+            } else if (puntosJugador > puntosCrupier) {
+                const ganancia = puntosJugador === 21 && manoJugador.length === 2 ? Math.floor(apuesta * 1.5) : apuesta;
+                mensajeElement.textContent = `¡GANASTE $${ganancia}!`;
+                balanceSystem.updateBalance(ganancia, true);
+            } else if (puntosJugador < puntosCrupier) {
+                mensajeElement.textContent = 'El crupier gana esta ronda';
+                balanceSystem.updateBalance(-apuesta, false);
+            } else {
+                mensajeElement.textContent = '¡EMPATE! Recuperas tu apuesta';
+            }
+            
+            juegoActivo = false;
+            apostarBtn.disabled = false;
+        }
+    
+        // Empezar nuevo juego
+        function empezarJuego(balanceSystem) {
+            apuesta = apuestaActual;
+            
+            if (apuesta > balanceSystem.getBalance()) {
+                mensajeElement.textContent = '¡No tienes suficientes fichas!';
+                mensajeElement.classList.add('sacudir');
+                setTimeout(() => mensajeElement.classList.remove('sacudir'), 400);
+                return;
+            }
+            
+            inicializarBaraja();
+            manoCrupier = [];
+            manoJugador = [];
+            juegoActivo = true;
+            
+            // Limpiar cartas anteriores
+            crupierCartasElement.innerHTML = '';
+            jugadorCartasElement.innerHTML = '';
+            mensajeElement.textContent = '';
+            
+            // Repartir cartas con animaciones escalonadas
+            setTimeout(() => {
+                repartirCarta(manoJugador, jugadorCartasElement);
+                setTimeout(() => {
+                    repartirCarta(manoCrupier, crupierCartasElement, true);
+                    setTimeout(() => {
+                        repartirCarta(manoJugador, jugadorCartasElement);
+                        setTimeout(() => {
+                            repartirCarta(manoCrupier, crupierCartasElement);
+                            
+                            // Actualizar puntuaciones
+                            jugadorPuntosElement.textContent = calcularPuntuacion(manoJugador);
+                            crupierPuntosElement.textContent = '?';
+                            
+                            // Comprobar Blackjack natural
+                            if (calcularPuntuacion(manoJugador) === 21) {
+                                setTimeout(() => {
+                                    mostrarCartasCrupier();
+                                    const ganancia = Math.floor(apuesta * 1.5);
+                                    mensajeElement.textContent = `¡BLACKJACK! GANAS $${ganancia}`;
+                                    balanceSystem.updateBalance(ganancia, true);
+                                    juegoActivo = false;
+                                    apostarBtn.disabled = false;
+                                }, 500);
+                            }
+                        }, 300);
+                    }, 300);
+                }, 300);
+            }, 300);
+            
+            // Mostrar juego
+            juegoContainer.style.display = 'block';
+            apostarBtn.disabled = true;
+        }
+        
+        // Inicialización del juego
+        document.addEventListener('DOMContentLoaded', () => {
+            const balanceSystem = setupBalanceSystem();
+            
+            // Event Listeners para botones de apuesta
+            incrementarBtn.addEventListener('click', () => actualizarApuesta(1));
+            decrementarBtn.addEventListener('click', () => actualizarApuesta(-1));
+            
+            // Botones de apuesta rápida
+            botonesApuestaRapida.forEach(boton => {
+                boton.addEventListener('click', () => {
+                    const monto = parseInt(boton.dataset.monto);
+                    apuestaActual = Math.min(MAX_APUESTA, apuestaActual + monto);
+                    valorApuestaElement.textContent = apuestaActual;
+                });
+            });
+            
+            apostarBtn.addEventListener('click', () => empezarJuego(balanceSystem));
+            
+            pedirBtn.addEventListener('click', () => {
+                if (!juegoActivo) return;
+                
+                repartirCarta(manoJugador, jugadorCartasElement);
+                jugadorPuntosElement.textContent = calcularPuntuacion(manoJugador);
+                
+                if (calcularPuntuacion(manoJugador) > 21) {
+                    setTimeout(() => comprobarResultado(balanceSystem), 500);
+                }
+            });
+            
+            plantarseBtn.addEventListener('click', () => {
+                if (!juegoActivo) return;
+                
+                mostrarCartasCrupier();
+                
+                // El crupier pide cartas hasta tener 17 o más
+                function turnoCrupier() {
+                    if (calcularPuntuacion(manoCrupier) < 17) {
+                        setTimeout(() => {
+                            repartirCarta(manoCrupier, crupierCartasElement);
+                            crupierPuntosElement.textContent = calcularPuntuacion(manoCrupier);
+                            turnoCrupier();
+                        }, 800);
+                    } else {
+                        setTimeout(() => comprobarResultado(balanceSystem), 500);
+                    }
+                }
+                
+                turnoCrupier();
+            });
+            
+            doblarBtn.addEventListener('click', () => {
+                if (!juegoActivo || apuesta * 2 > balanceSystem.getBalance()) {
+                    mensajeElement.textContent = 'No puedes doblar (fichas insuficientes)';
+                    mensajeElement.classList.add('sacudir');
+                    setTimeout(() => mensajeElement.classList.remove('sacudir'), 400);
+                    return;
+                }
+                
+                apuesta *= 2;
+                repartirCarta(manoJugador, jugadorCartasElement);
+                jugadorPuntosElement.textContent = calcularPuntuacion(manoJugador);
+                
+                mostrarCartasCrupier();
+                
+                // El crupier pide cartas hasta tener 17 o más
+                function turnoCrupier() {
+                    if (calcularPuntuacion(manoCrupier) < 17) {
+                        setTimeout(() => {
+                            repartirCarta(manoCrupier, crupierCartasElement);
+                            crupierPuntosElement.textContent = calcularPuntuacion(manoCrupier);
+                            turnoCrupier();
+                        }, 800);
+                    } else {
+                        setTimeout(() => comprobarResultado(balanceSystem), 500);
+                    }
+                }
+                
+                turnoCrupier();
+            });
+            
+            separarBtn.addEventListener('click', () => {
+                if (!juegoActivo || manoJugador.length !== 2 || manoJugador[0].valor !== manoJugador[1].valor || apuesta * 2 > balanceSystem.getBalance()) {
+                    mensajeElement.textContent = 'No puedes separar estas cartas';
+                    mensajeElement.classList.add('sacudir');
+                    setTimeout(() => mensajeElement.classList.remove('sacudir'), 400);
+                    return;
+                }
+                
+                mensajeElement.textContent = '¡Cartas separadas! (Jugando primera mano)';
+                apuesta *= 2;
+            });
+            
+            rendirseBtn.addEventListener('click', () => {
+                if (!juegoActivo) return;
+                
+                const recuperado = Math.floor(apuesta / 2);
+                mensajeElement.textContent = `Te rindes. Recuperas $${recuperado}`;
+                balanceSystem.updateBalance(recuperado, true);
+                juegoActivo = false;
+                apostarBtn.disabled = false;
+                mostrarCartasCrupier();
+            });
+    
+            // Protección contra cierre durante partida
+            window.addEventListener('beforeunload', (e) => {
+                if (juegoActivo) {
+                    e.preventDefault();
+                    return "¿Seguro que quieres salir? Perderás tu apuesta actual.";
+                }
+            });
+        });
+    </script>
+</body>
+</html><!-- Añadir antes de cerrar el </head> -->
+<script src="/static/js/balance-system.js"></script>
+
+<!-- Modificar el script principal para usar el sistema de balance -->
+<script>
+    // Resto del código existente...
+    
+    document.addEventListener('DOMContentLoaded', () => {
+        const balanceSystem = setupBalanceSystem();
+        
+        // Usar balanceSystem en lugar de la lógica anterior
+        
+        // Por ejemplo, en empezarJuego:
+        function empezarJuego() {
+            apuesta = apuestaActual;
+            
+            if (!balanceSystem.hasSufficientBalance(apuesta)) {
+                mensajeElement.textContent = '¡No tienes suficientes fichas!';
+                mensajeElement.classList.add('sacudir');
+                setTimeout(() => mensajeElement.classList.remove('sacudir'), 400);
+                return;
+            }
+            
+            // Descontar la apuesta
+            balanceSystem.updateBalance(-apuesta, false);
+            
+            // Resto del código de empezarJuego...
+        }
+        
+        // Y en comprobarResultado:
+        function comprobarResultado() {
+            const puntosJugador = calcularPuntuacion(manoJugador);
+            const puntosCrupier = calcularPuntuacion(manoCrupier);
+            
+            mostrarCartasCrupier();
+            
+            if (puntosJugador > 21) {
+                mensajeElement.textContent = '¡Te pasaste de 21!';
+                // No hacemos nada con el saldo porque ya se descontó al apostar
+            } else if (puntosCrupier > 21) {
+                const ganancia = apuesta * 2; // Recuperamos apuesta + ganancia
+                mensajeElement.textContent = `¡Crupier se pasó! GANAS ${ganancia}`;
+                balanceSystem.updateBalance(ganancia, true);
+            } else if (puntosJugador > puntosCrupier) {
+                const ganancia = puntosJugador === 21 && manoJugador.length === 2 
+                    ? Math.floor(apuesta * 2.5) // Blackjack paga 3:2
+                    : apuesta * 2; // Ganancia normal
+                mensajeElement.textContent = `¡GANASTE ${ganancia}!`;
+                balanceSystem.updateBalance(ganancia, true);
+            } else if (puntosJugador < puntosCrupier) {
+                mensajeElement.textContent = 'El crupier gana esta ronda';
+                // No hacemos nada con el saldo porque ya se descontó al apostar
+            } else {
+                mensajeElement.textContent = '¡EMPATE! Recuperas tu apuesta';
+                balanceSystem.updateBalance(apuesta, true); // Devolvemos la apuesta
+            }
+            
+            juegoActivo = false;
+            apostarBtn.disabled = false;
+        }
+        
+        // Conectar los event listeners con las funciones actualizadas
+        // ...
+    });
+</script>

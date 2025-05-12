@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-box">
+        <h2>Crear Cuenta</h2>
+        <form id="registerForm" action="{{ url_for('auth.register') }}" method="POST">
+            <div class="form-group">
+                <input type="text" name="username" placeholder="Nombre de usuario" required 
+                    minlength="4" maxlength="20" pattern="[a-zA-Z0-9]+" 
+                    title="Solo letras y números (4-20 caracteres)">
+            </div>
+            <div class="form-group">
+                <input type="email" name="email" placeholder="Email" required
+                    title="Ingresa un email válido">
+            </div>
+            <div class="form-group">
+                <input type="password" name="password" placeholder="Contraseña" required 
+                    minlength="6" pattern="^(?=.*[A-Za-z])(?=.*\d).{6,}$"
+                    title="Mínimo 6 caracteres con al menos una letra y un número">
+            </div>
+            <div class="form-group">
+                <input type="password" name="confirm_password" placeholder="Confirmar contraseña" required>
+            </div>
+            <button type="submit" class="auth-btn">Registrarse</button>
+        </form>
+        <p class="auth-link">¿Ya tienes cuenta? <a href="{{ url_for('auth.login') }}">Inicia sesión</a></p>
+        <div class="auth-error" style="display: none;"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<!-- Si necesitas incluir scripts específicos para esta página -->
+<script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+{% endblock %}

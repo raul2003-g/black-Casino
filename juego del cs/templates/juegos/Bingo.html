@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Bingo Casino</title>
+  <style>
+    :root {
+      --color-fondo: #0a1a0f;
+      --color-panel: #0e2e1a;
+      --color-oro: #ffd700;
+      --color-texto: #ffffff;
+      --sombra: 0 0 30px rgba(0, 0, 0, 0.7);
+    }
+
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      overflow-x: hidden;
+      color: var(--color-texto);
+      background: 
+          radial-gradient(circle at 20% 30%, rgba(10, 80, 50, 0.8) 0%, transparent 40%),
+          radial-gradient(circle at 80% 70%, rgba(20, 60, 30, 0.6) 0%, transparent 40%),
+          linear-gradient(to bottom, var(--color-fondo), #000000);
+      animation: fondoAnimado 20s infinite alternate;
+    }
+
+    @keyframes fondoAnimado {
+      0% { background-position: 0% 0%; }
+      100% { background-position: 100% 100%; }
+    }
+
+    .back-to-lobby {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      padding: 10px 15px;
+      border-radius: 5px;
+      text-decoration: none;
+      border: 1px solid var(--color-oro);
+      z-index: 1000;
+      transition: all 0.3s;
+    }
+
+    .back-to-lobby:hover {
+      background: rgba(255, 215, 0, 0.2);
+    }
+    
+    #bingo-card {
+      display: grid;
+      grid-template-columns: repeat(5, 60px);
+      gap: 5px;
+      margin: 20px auto;
+      width: max-content;
+    }
+    
+    .cell {
+      background: #444;
+      padding: 15px;
+      border-radius: 10px;
+      font-size: 18px;
+      transition: all 0.3s;
+    }
+    
+    .marked {
+      background-color: #1abc9c;
+      color: #000;
+      font-weight: bold;
+      transform: scale(0.95);
+    }
+    
+    #drawn-numbers {
+      margin-top: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 5px;
+      max-width: 90%;
+    }
+    
+    #drawn-numbers span {
+      background: #555;
+      padding: 5px 10px;
+      border-radius: 5px;
+    }
+    
+    button {
+      padding: 12px 25px;
+      margin: 10px;
+      background: linear-gradient(to bottom, var(--color-oro), #daa520);
+      color: black;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    button::before {
+      content: '';
+      position: absolute;
+      top: -10px;
+      left: -10px;
+      right: -10px;
+      bottom: -10px;
+      background: linear-gradient(45deg, rgba(255, 255, 255, 0.1), transparent);
+      transform: rotate(45deg);
+      z-index: 0;
+    }
+    
+    button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 10px rgba(0, 0, 0, 0.4);
+    }
+    
+    button:active {
+      transform: translateY(1px);
+    }
+    
+    button:disabled {
+      background: #555;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    
+    /* Balance Panel */
+    .balance-panel {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 10px 20px;
+      border-radius: 25px;
+      border: 2px solid var(--color-oro);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: bold;
+      box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+      z-index: 1000;
+    }
+
+    .balance-icon {
+      color: var(--color-oro);
+      font-size: 1.2rem;
+    }
+    
+    /* Notificaciones */
+    .balance-notification {
+      position: fixed;
+      top: 80px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.9);
+      padding: 12px 20px;
+      border-radius: 5px;
+      font-weight: bold;
+      z-index: 1001;
+      max-width: 300px;
+      transition: opacity 0.5s;
+      border-left: 4px solid currentColor;
+      opacity: 1;
+    }
+    
+    .notification-success {
+      border-left-color: #2ecc71;
+      color: #2ecc71;
+    }
+    
+    .notification-error {
+      border-left-color: #e74c3c;
+      color: #e74c3c;
+    }
+    
+    h1 {
+      color: var(--color-oro);
+      text-shadow: 2px 2px 4px #000;
+      margin: 20px 0;
+      font-size: 2.5rem;
+    }
+    
+    #current-number {
+      font-size: 2rem;
+      font-weight: bold;
+      color: var(--color-oro);
+      display: inline-block;
+      min-width: 50px;
+    }
+    
+    .game-container {
+      background-color: rgba(14, 46, 26, 0.8);
+      border-radius: 15px;
+      padding: 25px;
+      box-shadow: var(--sombra);
+      max-width: 800px;
+      width: 100%;
+      margin: 20px auto;
+      border: 1px solid rgba(255, 215, 0, 0.2);
+    }
+    
+    /* Nuevos estilos para los bots */
+    .bots-container {
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+      margin: 20px 0;
+      gap: 15px;
+    }
+    
+    .bot-card {
+      background: rgba(30, 30, 30, 0.7);
+      border-radius: 10px;
+      padding: 10px;
+      width: 120px;
+      border: 1px solid #444;
+    }
+    
+    .bot-name {
+      font-weight: bold;
+      color: var(--color-oro);
+      margin-bottom: 5px;
+    }
+    
+    .bot-progress {
+      height: 5px;
+      background: #333;
+      border-radius: 3px;
+      margin-top: 5px;
+      overflow: hidden;
+    }
+    
+    .bot-progress-fill {
+      height: 100%;
+      background: #e74c3c;
+      width: 0%;
+      transition: width 0.3s;
+    }
+    
+    /* Menús flotantes */
+    .floating-menu {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: var(--color-panel);
+      border: 2px solid var(--color-oro);
+      border-radius: 10px;
+      padding: 20px;
+      z-index: 2000;
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
+      max-width: 90%;
+      width: 500px;
+      display: none;
+    }
+    
+    .floating-menu h2 {
+      color: var(--color-oro);
+      margin-top: 0;
+      border-bottom: 1px solid var(--color-oro);
+      padding-bottom: 10px;
+    }
+    
+    .floating-menu p {
+      text-align: left;
+      line-height: 1.6;
+    }
+    
+    .floating-menu ul {
+      text-align: left;
+      padding-left: 20px;
+    }
+    
+    .floating-menu li {
+      margin-bottom: 8px;
+    }
+    
+    .close-menu {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: none;
+      border: none;
+      color: var(--color-texto);
+      font-size: 20px;
+      cursor: pointer;
+    }
+    
+    .menu-button {
+      position: fixed;
+      bottom: 20px;
+      padding: 10px 15px;
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      border: 1px solid var(--color-oro);
+      border-radius: 5px;
+      cursor: pointer;
+      z-index: 1000;
+      transition: all 0.3s;
+    }
+    
+    .menu-button:hover {
+      background: rgba(255, 215, 0, 0.2);
+    }
+    
+    #help-button {
+      left: 20px;
+    }
+    
+    #prizes-button {
+      left: 150px;
+    }
+    
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 1500;
+      display: none;
+    }
+    
+    /* Efecto de ganador */
+    .winner-effect {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle, rgba(255, 215, 0, 0.3) 0%, transparent 70%);
+      z-index: 1800;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 1s;
+    }
+    
+    .confetti {
+      position: fixed;
+      width: 10px;
+      height: 10px;
+      background-color: var(--color-oro);
+      opacity: 0;
+      z-index: 1801;
+      animation: confetti-fall 3s linear forwards;
+    }
+    
+    @keyframes confetti-fall {
+      0% {
+        transform: translateY(-100px) rotate(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(100vh) rotate(360deg);
+        opacity: 0;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      #bingo-card {
+        grid-template-columns: repeat(5, 50px);
+      }
+      
+      .cell {
+        padding: 10px;
+        font-size: 16px;
+      }
+      
+      button {
+        padding: 10px 15px;
+        font-size: 14px;
+      }
+      
+      h1 {
+        font-size: 2rem;
+      }
+      
+      .menu-button {
+        bottom: 10px;
+        padding: 8px 12px;
+        font-size: 14px;
+      }
+      
+      #help-button {
+        left: 10px;
+      }
+      
+      #prizes-button {
+        left: 120px;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      #bingo-card {
+        grid-template-columns: repeat(5, 40px);
+      }
+      
+      .cell {
+        padding: 8px;
+        font-size: 14px;
+      }
+      
+      .bots-container {
+        gap: 8px;
+      }
+      
+      .bot-card {
+        width: 80px;
+        padding: 5px;
+        font-size: 12px;
+      }
+    }
+  </style>
+</head>
+<script src="/static/js/balance-system.js"></script>
+<script src="/static/js/bingo-game.js"></script>
+<body>
+
+  <a href="/" class="back-to-lobby">← Volver al Lobby</a>
+  
+  <!-- Panel de saldo flotante -->
+  <div class="balance-panel">
+    <span class="balance-icon">💰</span>
+    <span id="saldo-usuario">{{ user_balance }}</span>
+  </div>
+
+  <!-- Botones de menú -->
+  <button class="menu-button" id="help-button">📖 Cómo jugar</button>
+  <button class="menu-button" id="prizes-button">🏆 Premios</button>
+
+  <div class="game-container">
+    <h1>🎰 Bingo del Casino 🎰</h1>
+    
+    <button id="buy-card">Comprar Cartón (20 créditos)</button>
+    <button id="draw-number" disabled>Sacar bola</button>
+    
+    <div id="bingo-card"></div>
+    
+    <p>Número actual: <span id="current-number">-</span></p>
+    
+    <h3>Números sacados:</h3>
+    <div id="drawn-numbers"></div>
+    
+    <h3>Oponentes (4 bots):</h3>
+    <div class="bots-container">
+      <div class="bot-card" id="bot1">
+        <div class="bot-name">Bot 1</div>
+        <div>Línea: <span class="bot-line">0%</span></div>
+        <div>Bingo: <span class="bot-bingo">0%</span></div>
+        <div class="bot-progress">
+          <div class="bot-progress-fill" style="width: 0%"></div>
+        </div>
+      </div>
+      <div class="bot-card" id="bot2">
+        <div class="bot-name">Bot 2</div>
+        <div>Línea: <span class="bot-line">0%</span></div>
+        <div>Bingo: <span class="bot-bingo">0%</span></div>
+        <div class="bot-progress">
+          <div class="bot-progress-fill" style="width: 0%"></div>
+        </div>
+      </div>
+      <div class="bot-card" id="bot3">
+        <div class="bot-name">Bot 3</div>
+        <div>Línea: <span class="bot-line">0%</span></div>
+        <div>Bingo: <span class="bot-bingo">0%</span></div>
+        <div class="bot-progress">
+          <div class="bot-progress-fill" style="width: 0%"></div>
+        </div>
+      </div>
+      <div class="bot-card" id="bot4">
+        <div class="bot-name">Bot 4</div>
+        <div>Línea: <span class="bot-line">0%</span></div>
+        <div>Bingo: <span class="bot-bingo">0%</span></div>
+        <div class="bot-progress">
+          <div class="bot-progress-fill" style="width: 0%"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Menú de ayuda flotante -->
+  <div class="overlay" id="overlay"></div>
+  
+  <div class="floating-menu" id="help-menu">
+    <button class="close-menu">&times;</button>
+    <h2>📖 Cómo jugar al Bingo</h2>
+    <p>Bienvenido al emocionante juego de Bingo del Casino. Sigue estas instrucciones para jugar:</p>
+    <ul>
+      <li><strong>Comprar un cartón:</strong> Cada cartón cuesta 20 créditos y contiene 24 números más un espacio libre en el centro.</li>
+      <li><strong>Sacar bolas:</strong> Cada vez que presiones el botón, se extraerá un número aleatorio.</li>
+      <li><strong>Marcar números:</strong> Si el número aparece en tu cartón, se marcará automáticamente.</li>
+      <li><strong>Formar líneas:</strong> Completa una línea horizontal para ganar 50 créditos.</li>
+      <li><strong>Bingo completo:</strong> Marca todos los números de tu cartón para ganar 200 créditos.</li>
+      <li><strong>Competencia:</strong> Juegas contra 4 bots que también intentan completar sus cartones.</li>
+    </ul>
+    <p><strong>Consejo:</strong> ¡Los bots tienen diferentes niveles de habilidad! Algunos son más rápidos que otros.</p>
+  </div>
+  
+  <!-- Menú de premios flotante -->
+  <div class="floating-menu" id="prizes-menu">
+    <button class="close-menu">&times;</button>
+    <h2>🏆 Premios del Bingo</h2>
+    <p>Estos son los premios que puedes ganar:</p>
+    <ul>
+      <li><strong>Línea completa:</strong> 50 créditos (primera línea horizontal completa)</li>
+      <li><strong>Bingo completo:</strong> 200 créditos (todo el cartón marcado)</li>
+    </ul>
+    <p><strong>Nota:</strong> Solo el primer jugador (humano o bot) que complete una línea o bingo gana el premio.</p>
+    <p><strong>Dificultad:</strong> Los bots tienen un 15% de probabilidad de ser más rápidos que tú en marcar números.</p>
+  </div>
+  
+  <!-- Efectos visuales -->
+  <div class="winner-effect" id="winner-effect"></div>
+
+<script>
+    /**
+ * Juego de Bingo para Casino mejorado
+ */
+document.addEventListener('DOMContentLoaded', function() {
+    // Elementos del DOM
+    const cardContainer = document.getElementById('bingo-card');
+    const drawBtn = document.getElementById('draw-number');
+    const currentNumberDisplay = document.getElementById('current-number');
+    const drawnNumbersDisplay = document.getElementById('drawn-numbers');
+    const buyCardBtn = document.getElementById('buy-card');
+    const helpButton = document.getElementById('help-button');
+    const prizesButton = document.getElementById('prizes-button');
+    const helpMenu = document.getElementById('help-menu');
+    const prizesMenu = document.getElementById('prizes-menu');
+    const overlay = document.getElementById('overlay');
+    const winnerEffect = document.getElementById('winner-effect');
+    
+    // Sistema de balance
+    const balanceSystem = setupBalanceSystem();
+    
+    // Configuración del juego
+    let drawnNumbers = [];
+    let numbersToDraw = [];
+    let cardNumbers = [];
+    let juegoActivo = false;
+    const PRECIO_CARTON = 20;
+    const PREMIO_LINEA = 50;
+    const PREMIO_BINGO = 200;
+    
+    // Bots
+    const bots = [
+        { id: 'bot1', name: 'Bot 1', speed: 0.7, line: 0, bingo: 0, card: [] },
+        { id: 'bot2', name: 'Bot 2', speed: 0.5, line: 0, bingo: 0, card: [] },
+        { id: 'bot3', name: 'Bot 3', speed: 0.9, line: 0, bingo: 0, card: [] },
+        { id: 'bot4', name: 'Bot 4', speed: 0.6, line: 0, bingo: 0, card: [] }
+    ];
+    
+    // Comprar cartón
+    function comprarCarton() {
+        if (!balanceSystem.hasSufficientBalance(PRECIO_CARTON)) {
+            balanceSystem.showNotification("No tenés créditos suficientes.", false);
+            return;
+        }
+        
+        // Descontar precio del cartón
+        balanceSystem.updateBalance(-PRECIO_CARTON, false);
+        
+        // Iniciar juego
+        iniciarJuego();
+        balanceSystem.showNotification(`Cartón comprado por ${PRECIO_CARTON} créditos`, true);
+    }
+    
+    // Iniciar juego
+    function iniciarJuego() {
+        drawBtn.disabled = false;
+        drawnNumbers = [];
+        numbersToDraw = Array.from({ length: 75 }, (_, i) => i + 1);
+        generarCarton();
+        generarCartonesBots();
+        currentNumberDisplay.textContent = "-";
+        drawnNumbersDisplay.innerHTML = '';
+        juegoActivo = true;
+        
+        // Reiniciar progreso de bots
+        bots.forEach(bot => {
+            bot.line = 0;
+            bot.bingo = 0;
+            updateBotUI(bot);
+        });
+    }
+    
+    // Generar cartón del jugador
+    function generarCarton() {
+        cardContainer.innerHTML = '';
+        cardNumbers = [];
+        
+        for (let i = 0; i < 25; i++) {
+            let number;
+            do {
+                number = Math.floor(Math.random() * 75) + 1;
+            } while (cardNumbers.includes(number));
+            
+            cardNumbers.push(number);
+            const cell = document.createElement('div');
+            cell.classList.add('cell');
+            cell.dataset.number = number;
+            cell.textContent = i === 12 ? '★' : number;
+            if (i === 12) cell.classList.add('marked'); // centro libre
+            cardContainer.appendChild(cell);
+        }
+    }
+    
+    // Generar cartones para los bots
+    function generarCartonesBots() {
+        bots.forEach(bot => {
+            bot.card = [];
+            for (let i = 0; i < 25; i++) {
+                let number;
+                do {
+                    number = Math.floor(Math.random() * 75) + 1;
+                } while (bot.card.includes(number));
+                
+                bot.card.push(number);
+            }
+        });
+    }
+    
+    // Sacar bola
+    function sacarBola() {
+        if (!juegoActivo || numbersToDraw.length === 0) {
+            balanceSystem.showNotification("No hay más bolas o no compraste un cartón.", false);
+            return;
+        }
+        
+        const index = Math.floor(Math.random() * numbersToDraw.length);
+        const number = numbersToDraw.splice(index, 1)[0];
+        drawnNumbers.push(number);
+        currentNumberDisplay.textContent = number;
+        actualizarHistorial();
+        marcarEnCarton(number);
+        marcarEnBots(number);
+        verificarPremios();
+    }
+    
+    // Actualizar historial
+    function actualizarHistorial() {
+        drawnNumbersDisplay.innerHTML = drawnNumbers.map(n => `<span>${n}</span>`).join('');
+    }
+    
+    // Marcar en cartón del jugador
+    function marcarEnCarton(numero) {
+        const cells = document.querySelectorAll('.cell');
+        cells.forEach(cell => {
+            if (parseInt(cell.dataset.number) === numero) {
+                cell.classList.add('marked');
+            }
+        });
+    }
+    
+    // Marcar en cartones de los bots
+    function marcarEnBots(numero) {
+        bots.forEach(bot => {
+            // Los bots tienen un 15% de probabilidad de ser más rápidos
+            const isFaster = Math.random() < 0.15;
+            
+            if (isFaster || Math.random() < bot.speed) {
+                if (bot.card.includes(numero)) {
+                    // Actualizar progreso del bot
+                    const markedCount = drawnNumbers.filter(n => bot.card.includes(n)).length + 1; // +1 por el número actual
+                    
+                    // Verificar línea (5 números en una fila)
+                    bot.line = Math.min(Math.floor(markedCount / 5) * 20, 100);
+                    
+                    // Verificar bingo (todos los números)
+                    bot.bingo = Math.min((markedCount / 24) * 100, 100); // 24 números (el centro no cuenta)
+                    
+                    updateBotUI(bot);
+                    
+                    // Verificar si el bot ganó
+                    verificarGanadorBot(bot, numero);
+                }
+            }
+        });
+    }
+    
+    // Actualizar UI del bot
+    function updateBotUI(bot) {
+        const botElement = document.getElementById(bot.id);
+        if (botElement) {
+            botElement.querySelector('.bot-line').textContent = `${bot.line}%`;
+            botElement.querySelector('.bot-bingo').textContent = `${bot.bingo}%`;
+            botElement.querySelector('.bot-progress-fill').style.width = `${Math.max(bot.line, bot.bingo/2)}%`;
+        }
+    }
+    
+    // Verificar premios del jugador
+    function verificarPremios() {
+        const cells = Array.from(document.querySelectorAll('.cell'));
+        let filas = [];
+        
+        // Crear filas
+        for (let i = 0; i < 5; i++) {
+            filas.push(cells.slice(i * 5, i * 5 + 5));
+        }
+        
+        // Verificar línea
+        for (const fila of filas) {
+            if (fila.every(cell => cell.classList.contains('marked'))) {
+                otorgarPremio("Línea", PREMIO_LINEA);
+                drawBtn.disabled = true;
+                juegoActivo = false;
+                showWinnerEffect();
+                return;
+            }
+        }
+        
+        // Verificar bingo completo
+        if (cells.filter(cell => !cell.classList.contains('marked')).length <= 1) { // Solo el centro puede estar sin marcar
+            otorgarPremio("¡Bingo!", PREMIO_BINGO);
+            drawBtn.disabled = true;
+            juegoActivo = false;
+            showWinnerEffect();
+        }
+    }
+    
+    // Verificar si un bot ganó
+    function verificarGanadorBot(bot, lastNumber) {
+        const markedCount = drawnNumbers.filter(n => bot.card.includes(n)).length;
+        
+        // Verificar línea (5 números seguidos)
+        if (markedCount >= 5 && Math.random() < 0.3) { // 30% de probabilidad de que el bot gane la línea
+            balanceSystem.showNotification(`¡${bot.name} ha completado una línea!`, false);
+            drawBtn.disabled = true;
+            juegoActivo = false;
+            return;
+        }
+        
+        // Verificar bingo (24 números)
+        if (markedCount >= 24) {
+            balanceSystem.showNotification(`¡${bot.name} ha cantado Bingo!`, false);
+            drawBtn.disabled = true;
+            juegoActivo = false;
+            return;
+        }
+    }
+    
+    // Otorgar premio
+    function otorgarPremio(nombre, cantidad) {
+        balanceSystem.showNotification(`${nombre} 🎉 Ganaste ${cantidad} créditos`, true);
+        balanceSystem.updateBalance(cantidad, true);
+    }
+    
+    // Mostrar efecto de ganador
+    function showWinnerEffect() {
+        winnerEffect.style.opacity = '1';
+        createConfetti();
+        
+        setTimeout(() => {
+            winnerEffect.style.opacity = '0';
+        }, 3000);
+    }
+    
+    // Crear efecto de confeti
+    function createConfetti() {
+        for (let i = 0; i < 100; i++) {
+            const confetti = document.createElement('div');
+            confetti.classList.add('confetti');
+            confetti.style.left = `${Math.random() * 100}vw`;
+            confetti.style.backgroundColor = `hsl(${Math.random() * 60 + 30}, 100%, 50%)`;
+            confetti.style.width = `${Math.random() * 10 + 5}px`;
+            confetti.style.height = `${Math.random() * 10 + 5}px`;
+            confetti.style.animationDuration = `${Math.random() * 2 + 2}s`;
+            document.body.appendChild(confetti);
+            
+            setTimeout(() => {
+                confetti.remove();
+            }, 3000);
+        }
+    }
+    
+    // Mostrar/ocultar menú de ayuda
+    helpButton.addEventListener('click', () => {
+        helpMenu.style.display = 'block';
+        overlay.style.display = 'block';
+    });
+    
+    // Mostrar/ocultar menú de premios
+    prizesButton.addEventListener('click', () => {
+        prizesMenu.style.display = 'block';
+        overlay.style.display = 'block';
+    });
+    
+    // Cerrar menús
+    document.querySelectorAll('.close-menu').forEach(button => {
+        button.addEventListener('click', () => {
+            helpMenu.style.display = 'none';
+            prizesMenu.style.display = 'none';
+            overlay.style.display = 'none';
+        });
+    });
+    
+    // Cerrar menús al hacer clic en el overlay
+    overlay.addEventListener('click', () => {
+        helpMenu.style.display = 'none';
+        prizesMenu.style.display = 'none';
+        overlay.style.display = 'none';
+    });
+    
+    // Configurar event listeners del juego
+    buyCardBtn.addEventListener('click', comprarCarton);
+    drawBtn.addEventListener('click', sacarBola);
+});
+  </script>
+</body>
+</html>

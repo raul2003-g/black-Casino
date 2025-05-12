@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Black & Gold Casino</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            background-color: #000;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        .casino-lobby {
+            background: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.9)), 
+                        url('https://images.unsplash.com/photo-1596838132731-3301c3fd4317?ixlib=rb-4.0.3');
+            background-size: cover;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 5%;
+            border-bottom: 2px solid #FFD700;
+            background: rgba(0, 0, 0, 0.7);
+            position: relative;
+            z-index: 10;
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #FFD700;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.7);
+        }
+
+        .user-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .balance-panel {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(20, 20, 20, 0.9);
+            padding: 10px 20px;
+            border-radius: 25px;
+            border: 2px solid #FFD700;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+            font-weight: bold;
+        }
+
+        .balance-icon {
+            color: #FFD700;
+            font-size: 1.2rem;
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .auth-btn {
+            padding: 8px 16px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .auth-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .auth-btn.primary {
+            background: #FFD700;
+            color: #000;
+        }
+
+        .auth-btn.secondary {
+            background: #333;
+            color: #FFD700;
+            border: 1px solid #FFD700;
+        }
+
+        .logout-btn {
+            background: #e63946;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: #c1121f;
+            transform: translateY(-2px);
+        }
+
+        /* Resto de tus estilos existentes... */
+        .main-content {
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        h1 {
+            font-size: 4rem;
+            color: #FFD700;
+            margin-bottom: 20px;
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+        }
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin: 50px 10%;
+        }
+
+        .game-card {
+            background: rgba(20, 20, 20, 0.8);
+            border: 2px solid #FFD700;
+            border-radius: 10px;
+            padding: 20px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .game-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .play-button {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 8px 16px;
+            background-color: #e63946;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: background-color 0.3s ease;
+        }
+
+        .light-effect {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, rgba(255,215,0,0.5), transparent 70%);
+            border-radius: 50%;
+            opacity: 0.5;
+            animation: flicker 3s infinite alternate;
+        }
+
+        @keyframes flicker {
+            0% { opacity: 0.3; }
+            100% { opacity: 0.7; }
+        }
+
+        @media (max-width: 768px) {
+            .games-grid {
+                grid-template-columns: 1fr;
+                margin: 30px 5%;
+            }
+            h1 {
+                font-size: 2.5rem;
+            }
+            .header {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="casino-lobby">
+        <!-- Efectos de luces -->
+        <div class="light-effect light-1"></div>
+        <div class="light-effect light-2"></div>
+        <div class="light-effect light-3"></div>
+
+        <!-- Header con controles de usuario -->
+        <div class="header">
+            <div class="logo">Black & Gold Casino</div>
+            <div class="user-controls">
+                {% if user %}
+                    <div class="balance-panel">
+                        <span class="balance-icon">💰</span>
+                        <span id="globalBalance">{{ user.balance }}</span>
+                        <button id="buyChipsBtn" class="buy-chips-btn">+</button>
+                    </div>
+                    <a href="{{ url_for('auth.logout') }}" class="logout-btn">Salir</a>
+                {% else %}
+                    <div class="auth-buttons">
+                        <a href="{{ url_for('auth.login') }}" class="auth-btn primary">Ingresar</a>
+                        <a href="{{ url_for('auth.register') }}" class="auth-btn secondary">Registrarse</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Contenido principal -->
+        <main>
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

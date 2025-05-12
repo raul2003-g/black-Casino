@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Soporte - Casino</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #101010;
+      color: #f0f0f0;
+      margin: 0;
+      padding: 0;
+    }
+
+    .back-to-lobby {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      padding: 10px 15px;
+      border-radius: 5px;
+      text-decoration: none;
+      border: 1px solid var(--color-oro);
+      z-index: 1000;
+      transition: all 0.3s;
+    }
+
+    .back-to-lobby:hover {
+      background: rgba(255, 215, 0, 0.2);
+    }
+
+    .support-section {
+      max-width: 700px;
+      margin: 50px auto;
+      background: #1f1f1f;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+    }
+
+    .support-section h2 {
+      font-size: 28px;
+      margin-bottom: 10px;
+      color: #ffcc00;
+    }
+
+    .support-section p {
+      margin-bottom: 15px;
+    }
+
+    .contact-options {
+      margin: 20px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .contact-link {
+      text-decoration: none;
+      color: #00bfff;
+      font-weight: bold;
+      transition: color 0.3s;
+    }
+
+    .contact-link:hover {
+      color: #ffd700;
+    }
+
+    .terms {
+      margin-top: 30px;
+      font-size: 14px;
+      line-height: 1.6;
+      background-color: #141414;
+      padding: 20px;
+      border-radius: 8px;
+      border: 1px solid #333;
+    }
+
+    .terms h3 {
+      color: #ffcc00;
+    }
+
+    .terms ul {
+      padding-left: 20px;
+    }
+
+    .terms li {
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <a href="/" class="back-to-lobby">← Volver al Lobby</a>
+  <section class="support-section">
+    <h2>¿Necesitás ayuda?</h2>
+    <p>Contactanos por nuestras redes o por correo electrónico:</p>
+
+    <div class="contact-options">
+      <a href="" class="contact-link">
+        📧 ecovision.labs@gmail.com
+      </a>
+      <a href="https://www.facebook.com/share/1H3HYgTN3e/" target="_blank" class="contact-link">
+        📘 Facebook - Casino
+      </a>
+      <a href="https://zt.ms/11cw" target="_blank" class="contact-link">
+        🧧 Telegram - Casino
+      </a>
+    </div>
+
+    <div class="terms">
+      <h3>Términos y Condiciones del Casino</h3>
+      <ul>
+        <li>Este casino está destinado exclusivamente a mayores de 18 años.</li>
+        <li>Promovemos el juego responsable. Jugar en exceso puede generar adicción.</li>
+        <li>El sistema de fichas funciona de manera automática: una vez que el usuario carga dinero y sube su comprobante, las fichas se acreditan de forma instantánea.</li>
+        <li>Si el comprobante es falso, ilegible o inválido, las fichas no serán acreditadas y cualquier ganancia obtenida no será aprobada.</li>
+        <li>En caso de intento de fraude, la cuenta del usuario será dada de baja permanentemente sin derecho a reclamo.</li>
+        <li>Al utilizar nuestra plataforma, el usuario acepta estos términos y condiciones.</li>
+      </ul>
+    </div>
+  </section>
+
+  <script>
+    console.log("Sección de soporte y términos cargada correctamente.");
+  </script>
+</body>
+</html>

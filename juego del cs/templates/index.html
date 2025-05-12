@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Black & Gold Casino</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            background-color: #000;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        .casino-lobby {
+            background: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.9)), 
+                        url('https://images.unsplash.com/photo-1596838132731-3301c3fd4317?ixlib=rb-4.0.3');
+            background-size: cover;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 5%;
+            border-bottom: 2px solid #FFD700;
+            background: rgba(0, 0, 0, 0.7);
+            position: relative;
+            z-index: 10;
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #FFD700;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.7);
+        }
+
+        .user-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-greeting {
+            color: #FFD700;
+            margin-right: 15px;
+            font-size: 1.1rem;
+        }
+
+        .user-greeting strong {
+            color: white;
+            text-shadow: 0 0 5px #FFD700;
+        }
+
+        .balance-panel {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(20, 20, 20, 0.9);
+            padding: 10px 20px;
+            border-radius: 25px;
+            border: 2px solid #FFD700;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+            font-weight: bold;
+        }
+
+        .balance-icon {
+            color: #FFD700;
+            font-size: 1.2rem;
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .auth-btn {
+            padding: 8px 16px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .auth-btn.primary {
+            background: #FFD700;
+            color: #000;
+        }
+
+        .auth-btn.secondary {
+            background: #333;
+            color: #FFD700;
+            border: 1px solid #FFD700;
+        }
+
+        .logout-btn {
+            background: #e63946;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: #c1121f;
+            transform: translateY(-2px);
+        }
+
+        .main-content {
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        h1 {
+            font-size: 4rem;
+            color: #FFD700;
+            margin-bottom: 20px;
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+        }
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin: 50px 10%;
+        }
+
+        .game-card {
+            background: rgba(20, 20, 20, 0.8);
+            border: 2px solid #FFD700;
+            border-radius: 10px;
+            padding: 20px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .game-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .play-button {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 8px 16px;
+            background-color: #e63946;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: background-color 0.3s ease;
+        }
+
+        .play-button:hover {
+            background-color: #d62828;
+        }
+
+        .light-effect {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, rgba(255,215,0,0.5), transparent 70%);
+            border-radius: 50%;
+            opacity: 0.5;
+            animation: flicker 3s infinite alternate;
+        }
+
+        @keyframes flicker {
+            0% { opacity: 0.3; }
+            100% { opacity: 0.7; }
+        }
+
+        .light-1 { top: 20%; left: 10%; }
+        .light-2 { top: 60%; right: 15%; }
+        .light-3 { bottom: 10%; left: 20%; }
+
+        @media (max-width: 768px) {
+            .games-grid {
+                grid-template-columns: 1fr;
+                margin: 30px 5%;
+            }
+            h1 {
+                font-size: 2.5rem;
+            }
+            .header {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+
+        .recargar-btn {
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 12px;
+        }
+
+        .chat-container {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 350px;
+            height: 500px;
+            background: rgba(20, 20, 20, 0.95);
+            border: 2px solid #FFD700;
+            border-radius: 10px;
+            z-index: 1001;
+            flex-direction: column;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .chat-header {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 10px;
+            border-bottom: 1px solid #FFD700;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-tabs {
+            display: flex;
+            border-bottom: 1px solid #333;
+        }
+
+        .chat-tab {
+            padding: 10px;
+            flex: 1;
+            text-align: center;
+            cursor: pointer;
+            background: rgba(40, 40, 40, 0.7);
+        }
+
+        .chat-tab.active {
+            background: rgba(255, 215, 0, 0.2);
+            border-bottom: 2px solid #FFD700;
+        }
+
+        .chat-content {
+            display: none;
+            flex: 1;
+            padding: 10px;
+            overflow-y: auto;
+        }
+
+        .chat-content.active {
+            display: block;
+        }
+
+        .chat-messages {
+            min-height: 300px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 10px;
+        }
+
+        .chat-input-area {
+            padding: 10px;
+            border-top: 1px solid #333;
+        }
+
+        .chat-input {
+            display: flex;
+            margin-bottom: 10px;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 8px;
+            background: rgba(30, 30, 30, 0.8);
+            border: 1px solid #FFD700;
+            color: white;
+            border-radius: 5px;
+        }
+
+        .chat-input button {
+            margin-left: 5px;
+            padding: 8px 15px;
+            background: #FFD700;
+            color: black;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .file-input-label {
+            display: block;
+            padding: 8px;
+            background: #27ae60;
+            color: white;
+            text-align: center;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .message {
+            margin-bottom: 10px;
+            padding: 8px;
+            background: rgba(40, 40, 40, 0.7);
+            border-radius: 5px;
+        }
+
+        .bot-message {
+            color: #FFD700;
+        }
+
+        .user-message {
+            color: white;
+            text-align: right;
+        }
+
+        .close-chat {
+            cursor: pointer;
+            color: #FFD700;
+        }
+
+        .balance-notification {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 5px;
+            border-left: 4px solid;
+            transition: opacity 0.5s;
+            z-index: 1001;
+            max-width: 300px;
+        }
+
+        .success {
+            border-left-color: #4CAF50;
+        }
+
+        .error {
+            border-left-color: #f44336;
+        }
+
+        .loader {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #FFD700;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            vertical-align: middle;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .file-selected {
+            font-size: 12px;
+            color: #FFD700;
+            margin-top: 5px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="casino-lobby">
+        <!-- Efectos de luces decorativas -->
+        <div class="light-effect light-1"></div>
+        <div class="light-effect light-2"></div>
+        <div class="light-effect light-3"></div>
+
+        <!-- Barra superior con logo y controles -->
+        <div class="header">
+            <div class="logo">Black & Gold Casino</div>
+            <div class="user-controls">
+                {% if user %}
+                    <div class="user-greeting">
+                        Bienvenido, <strong>{{ user.username }}</strong>
+                    </div>
+                    <div class="balance-panel">
+                        <span class="balance-icon">💰</span>
+                        <span id="globalBalance">{{ user.balance }}</span>
+                        <button class="recargar-btn" onclick="solicitarRecarga()">+</button>
+                    </div>
+                    <a href="{{ url_for('auth.logout') }}" class="logout-btn">Salir</a>
+                {% else %}
+                    <div class="auth-buttons">
+                        <a href="{{ url_for('auth.login') }}" class="auth-btn primary">Ingresar</a>
+                        <a href="{{ url_for('auth.register') }}" class="auth-btn secondary">Registrarse</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Contenido principal -->
+        <div class="main-content">
+            <h1>BIENVENIDO AL LOBBY</h1>
+            <p>Disfruta de los mejores juegos de casino en un ambiente de lujo y elegancia. ¡Gana grandes premios con estilo!</p>
+        </div>
+
+        <!-- Grid de juegos disponibles -->
+        <div class="games-grid">
+            <div class="game-card">
+                <h3>BLACKJACK</h3>
+                <p>El clásico juego de cartas con mesas exclusivas.</p>
+                <a href="{{ url_for('servir_juego', nombre_juego='Blackjack.html') }}" class="play-button">Entrar al juego</a>
+            </div>
+            <div class="game-card">
+                <h3>Bingo</h3>
+                <p>Dulces premios te esperan.</p>
+                <a href="{{ url_for('servir_juego', nombre_juego='Bingo.html') }}" class="play-button">Entrar al juego</a>
+            </div>
+            <div class="game-card">
+                <h3>Joker's</h3>
+                <p>Máquinas con jackpots millonarios.</p>
+                <a href="{{ url_for('servir_juego', nombre_juego='tragamonedas.html') }}" class="play-button">Entrar al juego</a>
+            </div>
+            <div class="game-card">
+                <h3>Sweet Bonanza</h3>
+                <p>Dulces premios te esperan.</p>
+                <a href="{{ url_for('servir_juego', nombre_juego='Sweet.html') }}" class="play-button">Entrar al juego</a>
+            </div>
+            <div class="game-card">
+                <h3>Rasca y Gana</h3>
+                <p>Dulces premios te esperan.</p>
+                <a href="{{ url_for('servir_juego', nombre_juego='Gana.html') }}" class="play-button">Entrar al juego</a>
+            </div>
+        </div>
+
+        <!-- Chat de operaciones -->
+        <div id="operacionesChat" class="chat-container">
+            <div class="chat-header">
+                <span>Asistente de Operaciones</span>
+                <span class="close-chat" onclick="cerrarChat()">✕</span>
+            </div>
+            
+            <div class="chat-tabs">
+                <div class="chat-tab active" data-tab="recargar" onclick="cambiarTab('recargar')">Recargar</div>
+                <div class="chat-tab" data-tab="retirar" onclick="cambiarTab('retirar')">Retirar</div>
+            </div>
+            
+            <!-- Contenido para Recargar -->
+            <div class="chat-content active" id="recargarContent">
+                <div class="chat-messages" id="recargarMessages">
+                    <div class="message bot-message">¡Hola! Para recargar fichas, escribe la cantidad deseada (ej: "500") y sube tu comprobante de transferencia.</div>
+                    <div class="message bot-message">Nuestro CBU para transferencia: 0000003100005108489230</div>
+                </div>
+                <div class="chat-input-area">
+                    <form action="{{ url_for('enviar_comprobante') }}" method="post"  enctype="multipart/form-data">
+                      <input type="text" name="cantidad" id="recargarInput" required placeholder="Escribe la cantidad...">
+                      <label for="comprobanteFile" class="file-input-label">
+                        Subir comprobante (imagen o PDF)
+                      </label>
+                      <div id="fileName" class="file-selected"></div>
+                      <input type="file" name="comprobante" id="comprobanteFile" class="file-input" accept="image/*,.pdf">
+                      <button type="submit" id="enviarRecarga">Enviar Recarga</button>
+                    </form>
+                  </div>
+            </div>
+            
+            <!-- Contenido para Retirar -->
+            <div class="chat-content" id="retirarContent">
+                <div class="chat-messages" id="retirarMessages">
+                    <div class="message bot-message">Despues de mandar la solicitud se verificara que todo este bien, tardara maximo 24 horas</div>
+                </div>
+                <form action="{{ url_for('solicitar_retiro') }}" method="post">
+                    <input type="number" name="cbu" placeholder="CBU" required>
+                    <input type="number" name="cantidad" placeholder="Cantidad de fichas" required>
+                    <button type="submit">Solicitar Retiro</button>
+                  </form>
+                  
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // Sistema de Chat
+function solicitarRecarga() {
+    document.getElementById('operacionesChat').style.display = 'flex';
+    document.getElementById('recargarInput').focus();
+}
+
+function cerrarChat() {
+    document.getElementById('operacionesChat').style.display = 'none';
+}
+
+function cambiarTab(tabName) {
+    document.querySelectorAll('.chat-tab').forEach(tab => tab.classList.remove('active'));
+    document.querySelectorAll('.chat-content').forEach(content => content.classList.remove('active'));
+    document.querySelector(`.chat-tab[data-tab="${tabName}"]`).classList.add('active');
+    document.getElementById(`${tabName}Content`).classList.add('active');
+}
+
+// Mostrar nombre de archivo seleccionado
+document.getElementById('comprobanteFile').addEventListener('change', function(e) {
+    const fileNameDisplay = document.getElementById('fileName');
+    fileNameDisplay.textContent = this.files.length > 0 ? `Archivo seleccionado: ${this.files[0].name}` : '';
+    fileNameDisplay.style.display = this.files.length > 0 ? 'block' : 'none';
+});
+
+// Función auxiliar para añadir mensajes al chat
+function addMessage(container, sender, text) {
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${sender}-message`;
+    messageDiv.innerHTML = text;
+    container.appendChild(messageDiv);
+    container.scrollTop = container.scrollHeight;
+}
+    
+    </script>
+    <div style="
+  margin: 20px auto;
+  max-width: 200px;
+  text-align: center;
+  background: #1f1f1f;
+  padding: 10px 20px;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
+">
+  <samp style="font-size: 16px;">
+    <a href="{{ url_for('servir_juego', nombre_juego='ayuda.html') }}" style="
+      text-decoration: none;
+      color: #ffd700;
+      font-weight: bold;
+      transition: color 0.3s ease;
+    " onmouseover="this.style.color='#ffffff'" onmouseout="this.style.color='#ffd700'">
+      🛈 Ayuda
+    </a>
+  </samp>
+</div>
+
+</body>
+</html>
